@@ -77,4 +77,4 @@
   roles:
     - role: benjamin-smith.ansible-ondrej-php-repo
     - role: geerlingguy.php
-    - role: ansible-role-nginx-fpm
+    - role: ansible-role-nginx-php-fpm
