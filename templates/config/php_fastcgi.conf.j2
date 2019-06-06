@@ -1,0 +1,16 @@
+# 404
+try_files $fastcgi_script_name =404;
+
+# default fastcgi_params
+include fastcgi_params;
+
+# fastcgi settings
+fastcgi_pass {{ nginx_fastcgi_pass }};
+fastcgi_index {{ nginx_fastcgi_index }};
+fastcgi_buffers {{ nginx_fastcgi_buffers }};
+fastcgi_buffer_size {{ nginx_fastcgi_buffer_size }};
+
+# fastcgi params
+{% for param in nginx_fastcgi_params %}
+fastcgi_param {{ param.name }} {{ param.value }};
+{% endfor %}

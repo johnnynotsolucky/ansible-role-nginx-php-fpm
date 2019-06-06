@@ -1,0 +1,60 @@
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+
+	server_name {{ item.host }};
+	set $base /var/www/{{ item.host }};
+	root $base/{{ item.web_dir }};
+
+	ssl_certificate {{ nginx_ssl_certificate_path }};
+	ssl_certificate_key {{ nginx_ssl_certificate_key_path }};
+
+  {% if nginx_ssl_trusted_certificate_path is defined %}
+    ssl_trusted_certificate {{ nginx_ssl_trusted_certificate_path }};
+  {% endif %}
+
+	index {{ item.index|default('index.html index.php') }};
+
+	location / {
+		try_files $uri $uri/ /{{ item.index|default('index.php') }}?$query_string;
+	}
+
+	location ~ \.php$ {
+		include config/php_fastcgi.conf;
+	}
+
+	include config/general.conf;
+}
+
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+
+  {% if nginx_redirect_subdomains %}
+    server_name *.{{ item.host }};
+  {% else %}
+    server_name {{ item.host }};
+  {% endif %}
+
+	ssl_certificate {{ nginx_ssl_certificate_path }};
+	ssl_certificate_key {{ nginx_ssl_certificate_key_path }};
+
+  {% if nginx_ssl_trusted_certificate_path is defined %}
+    ssl_trusted_certificate {{ nginx_ssl_trusted_certificate_path }};
+  {% endif %}
+
+	return 301 https://{{ item.host }}$request_uri;
+}
+
+server {
+	listen 80;
+	listen [::]:80;
+
+  {% if nginx_redirect_subdomains %}
+    server_name .{{ item.host }};
+  {% else %}
+    server_name {{ item.host }};
+  {% endif %}
+
+	return 301 https://{{ item.host }}$request_uri;
+}

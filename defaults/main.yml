@@ -1,0 +1,100 @@
+---
+
+# nginx_ssl_certificate_path:
+# nginx_ssl_certificate_key_path:
+# nginx_ssl_trusted_certificate_path:
+
+nginx_redirect_subdomains: true
+
+nginx_package_name: nginx
+nginx_ppa_use: false
+nginx_ppa_version: stable
+nginx_default_release: ""
+
+nginx_yum_repo_enabled: true
+
+nginx_worker_process: auto
+nginx_worker_rlimit_nofile: 65535
+
+nginx_events_multi_accept: true
+nginx_events_worker_connections: 65535
+
+nginx_http_charset: "utf-8"
+nginx_http_sendfile: true
+nginx_http_tcp_nopush: true
+nginx_http_tcp_nodelay: true
+nginx_http_server_tokens: false
+nginx_http_log_not_found: false
+nginx_http_types_hash_max_size: 2048
+nginx_http_client_max_body_size: 16M
+nginx_http_default_type: application/octet-stream
+nginx_http_access_log: "/var/log/nginx/access.log"
+nginx_http_error_log: "/var/log/nginx/error.log"
+nginx_http_error_log_level: warn
+
+nginx_http_ssl_session_timeout: 1d
+nginx_http_ssl_session_cache: "shared:SSL:50m"
+nginx_http_ssl_session_tickets: false
+nginx_http_ssl_protocols: "TLSv1.2"
+nginx_http_ssl_ciphers:
+  - ECDHE-ECDSA-AES256-GCM-SHA384
+  - ECDHE-RSA-AES256-GCM-SHA384
+  - ECDHE-ECDSA-CHACHA20-POLY1305
+  - ECDHE-RSA-CHACHA20-POLY1305
+  - ECDHE-ECDSA-AES128-GCM-SHA256
+  - ECDHE-RSA-AES128-GCM-SHA256
+  - ECDHE-ECDSA-AES256-SHA384
+  - ECDHE-RSA-AES256-SHA384
+  - ECDHE-ECDSA-AES128-SHA256
+  - ECDHE-RSA-AES128-SHA256
+nginx_http_ssl_prefer_server_ciphers: true
+nginx_http_ssl_stapling: false
+nginx_http_ssl_stapling_verify: false
+
+nginx_http_resolver: "208.67.222.222 208.67.220.220 valid=60s"
+nginx_http_resolver_timeout: 2s
+
+# FastCGI config
+nginx_fastcgi_pass: "unix:/var/run/php/php7.3-fpm.sock"
+nginx_fastcgi_index: "index.php"
+nginx_fastcgi_buffers: "8 16k"
+nginx_fastcgi_buffer_size: "32k"
+nginx_fastcgi_params:
+  - name: DOCUMENT_ROOT
+    value: "$realpath_root"
+  - name: SCRIPT_FILENAME
+    value: "$realpath_root$fastcgi_script_name"
+  - name: PHP_ADMIN_VALUE
+    value: "open_basedir=$base/:/usr/lib/php/:/tmp/"
+
+nginx_headers:
+  - "X-XSS-Protection \"1; mode=block\" always"
+  - "X-Content-Type-Options \"nosniff\" always"
+  - "Referrer-Policy \"no-referrer-when-downgrade\" always"
+  - "Strict-Transport-Security \"max-age=31536000; includeSubDomains; preload\" always"
+
+nginx_gzip_enabled: true
+nginx_gzip_vary_enabled: true
+nginx_gzip_proxied: any
+nginx_gzip_comp_level: 6
+nginx_gzip_types:
+  - text/plain
+  - text/css
+  - text/xml
+  - application/json
+  - application/javascript
+  - application/xml+rss
+  - application/atom+xml
+  - image/svg+xml
+
+nginx_site_template: "templates/site.conf.j2"
+nginx_sites:
+  - host: "{{ server_name }}"
+    web_dir: "web"
+
+# Example site config:
+# - filename: "example.com.conf"
+# - index: "index.php"
+# - host: "example.com"
+# - template: "my_site_template.conf.j2"
+# - state: present | absent

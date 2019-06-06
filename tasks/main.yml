@@ -1,0 +1,66 @@
+---
+
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Define nginx_user.
+  set_fact:
+    nginx_user: "{{ __nginx_user }}"
+  when: nginx_user is not defined
+
+- name: Install tasks for distribution
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - "setup-{{ ansible_distribution }}.yml"
+    - "setup-{{ ansible_os_family }}.yml"
+
+# Vhost configuration.
+- import_tasks: sites.yml
+
+- name: Copy nginx configuration in place.
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_conf_file_path }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: 0644
+  notify:
+    - reload nginx
+
+- name: Creates directory
+  file:
+    path: "{{ nginx_path }}/config"
+    state: directory
+    owner: root
+    mode: 0755
+
+- name: Copy nginx configuration in place.
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ nginx_path }}/config/{{ item.dest }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: 0644
+  with_list:
+    - src: config/general.conf.j2
+      dest: general.conf
+    - src: config/php_fastcgi.conf.j2
+      dest: php_fastcgi.conf
+  notify:
+    - reload nginx
+
+- name: Copy nginx configuration in place.
+  template:
+    src: sites-enabled/default.j2
+    dest: "{{ nginx_site_path }}/default"
+    owner: root
+    group: "{{ root_group }}"
+    mode: 0644
+  notify:
+    - reload nginx
+
+- name: Ensure nginx is started and enabled to start at boot.
+  service:
+    name: nginx
+    state: started
+    enabled: true

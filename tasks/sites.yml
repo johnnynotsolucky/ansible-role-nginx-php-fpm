@@ -1,0 +1,36 @@
+---
+- name: Ensure nginx_site_path exists.
+  file:
+    path: "{{ nginx_site_path }}"
+    state: directory
+  notify: reload nginx
+
+- name: Add site config files.
+  template:
+    src: "{{ item.template|default(nginx_site_template) }}"
+    dest: "{{ nginx_site_path }}/{{ item.filename|default(item.host.split(' ')[0] ~ '.conf') }}"
+    force: true
+    owner: root
+    group: "{{ root_group }}"
+    mode: 0644
+  when: item.state|default('present') != 'absent'
+  with_items: "{{ nginx_sites }}"
+  notify: reload nginx
+  tags:
+    - skip_ansible_lint
+
+- name: Remove site config files.
+  file:
+    path: "{{ nginx_site_path }}/{{ item.filename|default(item.host.split(' ')[0] ~ '.conf') }}"
+    state: absent
+  when: item.state|default('present') == 'absent'
+  with_items: "{{ nginx_vhosts }}"
+  notify: reload nginx
+  tags:
+    - skip_ansible_lint
+
+- name: Remove legacy vhosts.conf file.
+  file:
+    path: "{{ nginx_site_path }}/vhosts.conf"
+    state: absent
+  notify: reload nginx

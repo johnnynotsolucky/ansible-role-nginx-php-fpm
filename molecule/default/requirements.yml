@@ -1,0 +1,5 @@
+---
+- src: geerlingguy.php
+
+- name: benjamin-smith.ansible-ondrej-php-repo
+  src: https://github.com/benjamin-smith/ansible-ondrej-php-repo

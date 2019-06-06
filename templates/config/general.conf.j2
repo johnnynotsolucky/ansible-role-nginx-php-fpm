@@ -1,0 +1,11 @@
+# security headers
+{% for header in nginx_headers %}
+add_header {{ header }};
+{% endfor %}
+
+# gzip
+gzip {{ 'on' if nginx_gzip_enabled else 'off' }};
+gzip_vary {{ 'on' if nginx_gzip_vary_enabled else 'off' }};
+gzip_proxied {{ nginx_gzip_proxied }};
+gzip_comp_level {{ nginx_gzip_comp_level }};
+gzip_types {{ nginx_gzip_types|join(' ') }};

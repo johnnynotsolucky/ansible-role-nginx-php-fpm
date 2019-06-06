@@ -1,0 +1,80 @@
+---
+- name: Converge
+  hosts: all
+
+  vars:
+    nginx_use_ppa: true
+    server_name: "test.dev"
+    nginx_ssl_certificate_path: "/etc/test-certs/client.cer"
+    nginx_ssl_certificate_key_path: "/etc/test-certs/client.key"
+    nginx_ssl_trusted_certificate_path: "/etc/test-certs/trusted.pem"
+    php_enable_php_fpm: true
+    php_fpm_listen: "/var/run/php/php7.3-fpm.sock"
+    php_fpm_daemon: php7.3-fpm
+    php_default_version_debian: 7.3
+    php_enable_webserver: false
+
+  pre_tasks:
+    - name: Update apt cache.
+      apt: update_cache=yes cache_valid_time=600
+      when: ansible_os_family == 'Debian'
+      changed_when: false
+
+    - name: Update apt cache.
+      apt:
+        update_cache: true
+        cache_valid_time: 600
+      when: ansible_os_family == 'Debian'
+      changed_when: false
+
+    - name: Stat test-certs directory
+      stat:
+        path: /etc/test-certs/
+      register: test_certs_dir
+
+    - name: Create test-certs if it doesn't exist
+      file:
+        path: /etc/test-certs
+        state: directory
+        owner: root
+        group: root
+        mode: 0775
+      when: not test_certs_dir.stat.exists
+
+    - name: Copy test SSL certificates
+      copy:
+        src: "{{ item.src }}"
+        dest: "/etc/test-certs/{{ item.dest }}"
+        owner: root
+        group: root
+        mode: 0600
+      loop:
+        - src: "ssl/client.cer"
+          dest: "client.cer"
+        - src: "ssl/client.key"
+          dest: "client.key"
+        - src: "ssl/trusted.pem"
+          dest: "trusted.pem"
+        - src: "ssl/issuer.pem"
+          dest: "issuer.pem"
+
+    - name: Create web directory if it does not exist
+      file:
+        path: /var/www/{{ server_name }}/web
+        state: directory
+        mode: '0755'
+        owner: www-data
+        group: www-data
+
+    - name: Copy index.php to web directory
+      copy:
+        src: index.php
+        dest: /var/www/{{ server_name }}/web/index.php
+        owner: www-data
+        group: www-data
+        mode: 0755
+
+  roles:
+    - role: benjamin-smith.ansible-ondrej-php-repo
+    - role: geerlingguy.php
+    - role: ansible-role-nginx-fpm

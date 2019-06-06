@@ -1,0 +1,48 @@
+user {{ nginx_user }};
+pid {{ nginx_pidfile }};
+worker_processes {{ nginx_worker_process }};
+worker_rlimit_nofile {{ nginx_worker_rlimit_nofile }};
+
+events {
+	multi_accept {{ 'on' if nginx_events_multi_accept else 'off' }};
+	worker_connections {{ nginx_events_worker_connections }};
+}
+
+http {
+	charset {{ nginx_http_charset }};
+	sendfile {{ 'on' if nginx_http_sendfile else 'off' }};
+	tcp_nopush {{ 'on' if nginx_http_tcp_nopush else 'off' }};
+	tcp_nodelay {{ 'on' if nginx_http_tcp_nodelay else 'off' }};
+	server_tokens {{ 'on' if nginx_http_server_tokens else 'off' }};
+	log_not_found {{ 'on' if nginx_http_log_not_found else 'off' }};
+	types_hash_max_size {{ nginx_http_types_hash_max_size }};
+	client_max_body_size {{ nginx_http_client_max_body_size }};
+
+	# MIME
+	include {{ nginx_mime_file_path|default('mime.types') }};
+	default_type {{ nginx_http_default_type }};
+
+	# logging
+	access_log {{ nginx_http_access_log }};
+	error_log {{ nginx_http_error_log_level }} {{ nginx_http_error_log_level }};
+
+	# SSL
+	ssl_session_timeout {{ nginx_http_ssl_session_timeout }};
+	ssl_session_cache {{ nginx_http_ssl_session_cache }};
+	ssl_session_tickets {{ 'on' if nginx_http_ssl_session_tickets else 'off' }};
+
+	# modern configuration
+	ssl_protocols TLSv1.2;
+	ssl_ciphers {{ nginx_http_ssl_ciphers|join(':') }};
+	ssl_prefer_server_ciphers {{ 'on' if nginx_http_ssl_prefer_server_ciphers else 'off' }};
+
+	# OCSP Stapling
+	ssl_stapling {{ 'on' if nginx_http_ssl_stapling else 'off' }};
+	ssl_stapling_verify {{ 'on' if nginx_http_ssl_stapling_verify else 'off' }};
+	resolver {{ nginx_http_resolver }};
+	resolver_timeout {{ nginx_http_resolver_timeout }};
+
+	# load configs
+	include /etc/nginx/conf.d/*.conf;
+	include /etc/nginx/sites-enabled/*;
+}
