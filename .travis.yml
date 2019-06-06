@@ -1,0 +1,16 @@
+---
+language: python
+python:
+  - "3.5"
+
+services: docker
+
+env:
+  global:
+    - ROLE_NAME: nginx
+
+install:
+  - pip install "testinfra==3.0.4" molecule docker
+
+script:
+  - molecule test
