@@ -72,4 +72,3 @@ def test_site_tls_redirect(host):
         "| grep -E '^Location:' "
         "| awk '{print $2}'"))
     assert result.stdout == "https://test.dev/\r\n"
-
