@@ -6,8 +6,8 @@ Based on [http://github.com/geerlingguy/ansible-role-nginx/](http://github.com/g
 Requirements
 ------------
 
-PHP-FPM ([https://github.com/geerlingguy/ansible-role-php](https://github.com/geerlingguy/ansible-role-php))
-SSL Certificates
+- PHP-FPM ([https://github.com/geerlingguy/ansible-role-php](https://github.com/geerlingguy/ansible-role-php))
+- SSL Certificates
 
 Role Variables
 --------------
