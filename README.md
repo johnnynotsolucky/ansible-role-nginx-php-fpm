@@ -6,50 +6,41 @@ Based on [http://github.com/geerlingguy/ansible-role-nginx/](http://github.com/g
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should
-be mentioned here. For instance, if the role uses the EC2 module, it may be a
-good idea to mention in this section that the boto package is required.
+PHP-FPM ([https://github.com/geerlingguy/ansible-role-php](https://github.com/geerlingguy/ansible-role-php))
+SSL Certificates
 
 Role Variables
 --------------
 
-`nginx_user`
-`certbot_admin_email`
+_TODO_
 
-# nginx_ssl_certificate_path:
-# nginx_ssl_certificate_key_path:
-# nginx_ssl_trusted_certificate_path:
+`nginx_ssl_certificate_path`
+`nginx_ssl_certificate_key_path`
+`nginx_ssl_trusted_certificate_path`
 
-A description of the settable variables for this role should go here, including
-any variables that are in defaults/main.yml, vars/main.yml, and any variables
-that can/should be set via parameters to the role. Any variables that are read
-from other roles and/or the global scope (ie. hostvars, group vars, etc.) should
-be mentioned here as well.
-
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in
-regards to parameters that may need to be set for other roles, or variables that
-are used from other roles.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables
-passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: ansible-role-nginx-fpm, x: 42 }
+```yaml
+- hosts: all
+  vars:
+    nginx_use_ppa: true
+    server_name: "test.dev"
+    nginx_ssl_certificate_path: "/etc/certs/client.cer"
+    nginx_ssl_certificate_key_path: "/etc/certs/client.key"
+    nginx_ssl_trusted_certificate_path: "/etc/certs/trusted.pem"
+    php_enable_php_fpm: true
+    php_fpm_listen: "/var/run/php/php7.3-fpm.sock"
+    php_fpm_daemon: php7.3-fpm
+    php_default_version_debian: 7.3
+    php_enable_webserver: false
+  roles:
+    - role: geerlingguy.php
+    - ansible-role-nginx-php-fpm
+```
 
 License
 -------
 
 MIT
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a
-website (HTML is not allowed).
