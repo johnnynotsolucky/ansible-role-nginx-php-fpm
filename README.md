@@ -37,7 +37,7 @@ Example Playbook
     php_enable_webserver: false
   roles:
     - role: geerlingguy.php
-    - ansible-role-nginx-php-fpm
+    - role: ansible-role-nginx-php-fpm
 ```
 
 License
