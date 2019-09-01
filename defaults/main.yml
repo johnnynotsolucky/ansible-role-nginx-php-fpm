@@ -87,6 +87,8 @@ nginx_gzip_types:
   - application/atom+xml
   - image/svg+xml
 
+nginx_include_default_site: false
+
 nginx_site_template: "templates/site.conf.j2"
 nginx_sites:
   - host: "{{ server_name }}"

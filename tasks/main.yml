@@ -56,6 +56,15 @@
     owner: root
     group: "{{ root_group }}"
     mode: 0644
+  when: nginx_include_default_site|bool
+  notify:
+    - reload nginx
+
+- name: Remove default configuration
+  file:
+    path: "{{ nginx_site_path }}/default"
+    state: absent
+  when: not nginx_include_default_site
   notify:
     - reload nginx
 
